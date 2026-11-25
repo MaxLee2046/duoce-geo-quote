@@ -123,11 +123,12 @@
     .intro { margin: 0 auto 32px; text-align: center; }
     .intro p { margin-left: auto; margin-right: auto; }
     .wizard { max-width: 790px; margin: 0 auto; }
-    .progress { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 0 18px; }
+    .progress { display: flex; align-items: center; justify-content: center; gap: 26px; width: fit-content; max-width: 100%; margin: 0 auto 20px; padding: 9px 22px; border: 1px solid rgba(10,37,64,.08); border-radius: 999px; background: rgba(255,255,255,.82); box-shadow: 0 8px 22px rgba(10,37,64,.05); }
     .progress-item { display: flex; align-items: center; gap: 8px; color: #8c9db0; font-size: 12px; font-weight: 800; white-space: nowrap; }
     .progress-item::before { content: attr(data-step); display: grid; place-items: center; width: 26px; height: 26px; border: 1px solid var(--line); border-radius: 50%; background: #fff; color: var(--muted); font-size: 11px; }
     .progress-item.active, .progress-item.done { color: var(--ink); }
-    .progress-item.active::before, .progress-item.done::before { border-color: var(--ink); background: var(--ink); color: #fff; }
+    .progress-item.done::before { border-color: var(--ink); background: #fff; color: var(--ink); }
+    .progress-item.active::before { border-color: var(--ink); background: var(--ink); color: #fff; box-shadow: 0 0 0 4px rgba(10,37,64,.08); }
     .wizard-panel { min-height: 435px; padding: 38px; }
     .wizard-step[hidden] { display: none; }
     .step-kicker { margin: 0 0 12px; color: #007dfe; font-size: 12px; font-weight: 800; letter-spacing: .16em; }
@@ -188,9 +189,9 @@
     @media (max-width: 600px) {
       .intro { text-align: left; }
       .intro p { margin-left: 0; }
-      .progress { gap: 3px; }
-      .progress-item { justify-content: center; font-size: 0; }
-      .progress-item::before { width: 28px; height: 28px; }
+      .progress { gap: 10px; padding: 6px 12px; }
+      .progress-item { gap: 5px; font-size: 10px; }
+      .progress-item::before { width: 24px; height: 24px; font-size: 9px; }
       .wizard-panel { min-height: 0; padding: 25px 20px; }
       .industry-menu { max-height: 45vh; }
       .version-cards, .period-cards, .range-layout { grid-template-columns: 1fr; }
@@ -217,7 +218,7 @@
       h1 { font-size: clamp(34px, 3.55vw, 46px); line-height: 1.01; }
       .intro p { margin-top: 4px; font-size: 11px; line-height: 1.4; }
       .wizard { flex: 1 1 auto; min-height: 0; width: 100%; max-width: 930px; display: flex; flex-direction: column; }
-      .progress { flex: 0 0 auto; gap: 6px; margin: 0 0 5px; }
+      .progress { flex: 0 0 auto; gap: 20px; margin: 0 auto 10px; padding: 7px 18px; }
       .progress-item { gap: 6px; font-size: 10px; }
       .progress-item::before { width: 21px; height: 21px; font-size: 9px; }
       .wizard-panel { flex: 1 1 auto; min-height: 0; padding: 12px 28px; }
@@ -318,10 +319,11 @@
         max-width: 590px;
         margin: 0;
         justify-self: center;
-        align-self: center;
+        align-self: start;
+        padding-top: 6px;
       }
       .wizard-panel { padding: 22px 28px; }
-      .progress { margin-bottom: 14px; }
+      .progress { margin-bottom: 16px; }
       .step-kicker { margin-bottom: 7px; }
       .wizard-step h2 { line-height: 1.25; }
       .step-copy { margin: 11px 0 18px; line-height: 1.65; }
@@ -682,8 +684,8 @@
     <section class="wizard" aria-label="GEO 服务报价三步试算器">
       <div class="progress" aria-label="试算进度">
         <div class="progress-item active" data-progress="1" data-step="01">行业与范围</div>
-        <div class="progress-item" data-progress="2" data-step="02">版本</div>
-        <div class="progress-item" data-progress="3" data-step="03">结果</div>
+        <div class="progress-item" data-progress="2" data-step="02">版本与周期</div>
+        <div class="progress-item" data-progress="3" data-step="03">解决方案</div>
       </div>
       <div class="panel wizard-panel">
         <section class="wizard-step" data-step-panel="1">
@@ -1363,8 +1365,8 @@
         });
 
         // 优先用 Blob 下载（大图远比 dataURL 可靠），失败再退回 dataURL
-        const brandName = state.projectName || state.keywordTerms[0] || 'GEO';
-        const fileName = brandName + '_GEO报价方案.png';
+        const brandName = state.projectName || state.keywordTerms[0] || '';
+        const fileName = brandName ? brandName + '_GEO报价方案.png' : '夺策GEO报价方案.png';
         const blob = await new Promise((resolve) => {
           try { canvas.toBlob(resolve, 'image/png'); }
           catch (err) { resolve(null); }
