@@ -693,7 +693,7 @@
           <div class="field">
             <label class="required" for="industry-trigger">所属行业</label>
             <div class="industry-picker" id="industry-picker">
-              <input id="industry" type="hidden" value="" required />
+              <input id="industry" type="hidden" value="本地生活" required />
               <button class="industry-trigger is-placeholder" id="industry-trigger" type="button" aria-expanded="false" aria-controls="industry-menu">请选择所属行业</button>
               <div class="industry-menu" id="industry-menu" role="listbox" aria-label="所属行业"></div>
             </div>
@@ -708,8 +708,8 @@
               <label for="platforms">运营平台数</label>
               <div class="number-wrap"><input id="platforms" class="computed-number" type="text" value="11" readonly tabindex="-1" aria-describedby="platform-note" /><span class="number-suffix">个</span></div>
             </div>
-            <div class="field"><label for="keywords">关键词数</label><div class="number-wrap"><input id="keywords" type="number" min="1" max="5" value="1" inputmode="numeric" /><span class="number-suffix">个</span></div></div>
-            <div class="field"><label for="packages">文章权益包</label><div class="number-wrap"><input id="packages" type="number" min="0" value="0" inputmode="numeric" /><span class="number-suffix">包</span></div><p class="package-note" id="package-note">整单增购，可不选</p></div>
+            <div class="field"><label for="keywords">关键词数</label><div class="number-wrap"><input id="keywords" type="number" min="1" max="5" value="2" inputmode="numeric" /><span class="number-suffix">个</span></div></div>
+            <div class="field"><label for="packages">文章权益包</label><div class="number-wrap"><input id="packages" type="number" min="0" value="6" inputmode="numeric" /><span class="number-suffix">包</span></div><p class="package-note" id="package-note">整单增购，可不选</p></div>
           </div>
           <div class="scope-details">
             <section class="platform-selection" aria-labelledby="platform-selection-label">
@@ -748,9 +748,9 @@
           <div class="field">
             <span class="field-label">服务周期</span>
             <div class="period-cards toggle-group three" id="period-toggle" role="group" aria-label="服务周期">
-              <button class="toggle active" type="button" data-value="季度">季度</button>
+              <button class="toggle" type="button" data-value="季度">季度</button>
               <button class="toggle" type="button" data-value="半年">半年</button>
-              <button class="toggle" type="button" data-value="年度">年度</button>
+              <button class="toggle active" type="button" data-value="年度">年度</button>
             </div>
           </div>
           <div class="wizard-actions"><button class="button" type="button" data-back="1">上一步</button><button class="button button-primary" type="button" data-next="3">查看预算与权益</button></div>
@@ -1003,18 +1003,18 @@
     const savedState = loadSavedState();
     const state = {
       step: (savedState && Number.isFinite(savedState.step) && savedState.step >= 1 && savedState.step <= 3) ? savedState.step : 1,
-      industry: (savedState && typeof savedState.industry === 'string') ? savedState.industry : '',
+      industry: (savedState && typeof savedState.industry === 'string') ? savedState.industry : '本地生活',
       version: (savedState && ['标准版','PRO版'].includes(savedState.version)) ? savedState.version : '标准版',
-      period: (savedState && ['季度','半年','年度'].includes(savedState.period)) ? savedState.period : '季度',
+      period: (savedState && ['季度','半年','年度'].includes(savedState.period)) ? savedState.period : '年度',
       platforms: (savedState && Number.isFinite(savedState.platforms)) ? Math.min(11, Math.max(3, savedState.platforms)) : 11,
       platformNames: (savedState && Array.isArray(savedState.platformNames) && savedState.platformNames.length >= 3)
         ? savedState.platformNames.filter(p => ['豆包','DeepSeek','Kimi','腾讯元宝','通义千问','文心一言','纳米AI','讯飞星火','百度AI','抖音AI','夸克AI'].includes(p))
         : ['豆包', 'DeepSeek', 'Kimi', '腾讯元宝', '通义千问', '文心一言', '纳米AI', '讯飞星火', '百度AI', '抖音AI', '夸克AI'],
-      keywords: (savedState && Number.isFinite(savedState.keywords)) ? Math.min(5, Math.max(1, savedState.keywords)) : 1,
+      keywords: (savedState && Number.isFinite(savedState.keywords)) ? Math.min(5, Math.max(1, savedState.keywords)) : 2,
       keywordTerms: (savedState && Array.isArray(savedState.keywordTerms))
         ? savedState.keywordTerms.map(t => typeof t === 'string' ? t : '')
-        : [''],
-      packages: (savedState && Number.isFinite(savedState.packages)) ? Math.max(0, Math.floor(savedState.packages)) : 0,
+        : ['', ''],
+      packages: (savedState && Number.isFinite(savedState.packages)) ? Math.max(0, Math.floor(savedState.packages)) : 6,
       projectName: (savedState && typeof savedState.projectName === 'string') ? savedState.projectName : ''
     };
     const $ = (id) => document.getElementById(id);
@@ -1149,7 +1149,7 @@
       const pkgPrice = articlePackages[category];
 
       // 步骤2的提示
-      $('package-note').textContent = state.packages ? `整单增购，含 ${packageArticles} 篇文章` : '整单增购，可不选';
+      $('package-note').textContent = state.packages ? `整单增购，含 ${format(packageArticles)} 篇文章` : '整单增购，可不选';
 
       // === 报价方案详情页数据 ===
       const brandName = state.projectName || state.keywordTerms[0] || '品牌';
@@ -1170,13 +1170,13 @@
       $('equity-gen').textContent = format(totalGen);
       $('equity-publish').textContent = format(totalPub);
       $('equity-report').textContent = format(totalRep);
-      $('proposal-equity-note').textContent = `${state.keywords} 个关键词合计权益${state.packages ? `，发文含增购包 ${packageArticles} 篇` : ''}`;
+      $('proposal-equity-note').textContent = `${state.keywords} 个关键词合计权益${state.packages ? `，发文含增购包 ${format(packageArticles)} 篇` : ''}`;
 
       // 计算明细
       $('calc-kw-desc').textContent = `${state.keywords} 个关键词 × ¥${format(unitPrice)} 刊例价`;
       $('calc-kw-total').textContent = `¥ ${format(kwBaseTotal)}`;
       if (state.packages > 0) {
-        $('calc-package-desc').textContent = `${state.packages} 包 × ¥${format(pkgPrice)}/包 · 共 ${packageArticles} 篇`;
+        $('calc-package-desc').textContent = `${state.packages} 包 × ¥${format(pkgPrice)}/包 · 共 ${format(packageArticles)} 篇`;
         $('calc-package-total').textContent = `¥ ${format(packageTotal)}`;
       } else {
         $('calc-package-desc').textContent = '未选购文章权益包';
@@ -1281,7 +1281,7 @@
       if (canAdvance(next)) showStep(next);
     }));
     document.querySelectorAll('[data-back]').forEach((button) => button.addEventListener('click', () => showStep(Number(button.dataset.back))));
-    $('restart').addEventListener('click', () => { clearSavedState(); state.industry = ''; state.projectName = ''; state.keywords = 1; state.keywordTerms = ['']; state.packages = 0; state.version = '标准版'; state.period = '季度'; state.platformNames = ['豆包', 'DeepSeek', 'Kimi']; state.platforms = 3; $('project-name').value = ''; $('keywords').value = 1; $('packages').value = 0; renderKeywordFields(); updatePlatformSelection(); setIndustry(''); showStep(1); saveState(); });
+    $('restart').addEventListener('click', () => { clearSavedState(); state.projectName = ''; state.keywords = 2; state.keywordTerms = ['', '']; state.packages = 6; state.version = '标准版'; state.period = '年度'; state.platformNames = ['豆包','DeepSeek','Kimi','腾讯元宝','通义千问','文心一言','纳米AI','讯飞星火','百度AI','抖音AI','夸克AI']; state.platforms = 11; $('project-name').value = ''; $('keywords').value = 2; $('packages').value = 6; renderKeywordFields(); updatePlatformSelection(); setIndustry('本地生活'); showStep(1); saveState(); });
     function restoreUI() {
       // 恢复行业选择
       if (state.industry) {
@@ -1317,14 +1317,8 @@
       updateResult();
     }
     // 如果有保存的状态，恢复 UI 并跳转到对应步骤
-    if (savedState) {
-      restoreUI();
-      showStep(state.step);
-    } else {
-      updatePlatformSelection();
-      renderKeywordFields();
-      updateResult();
-    }
+    restoreUI();
+    showStep(state.step);
     // ===== 导出图片功能 =====
     $('export-png').addEventListener('click', async () => {
       const btn = $('export-png');
